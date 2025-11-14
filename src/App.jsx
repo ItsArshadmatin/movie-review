@@ -1,18 +1,31 @@
-import './App.css'
-import { BrowserRouter } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import './App.css'
+import AuthProvider, { useAuth } from './providers/AuthProvider'
+import Layout from './components/layout/Layout'
 import Router from './routes/Router'
-import { AuthProvider } from './providers/AuthProvider'
+
+function AppContent() {
+  const { loading } = useAuth()
+
+  if (loading) {
+    return <div className="loading">Loading...</div>
+  }
+
+  return (
+    <Layout>
+      <Router />
+    </Layout>
+  )
+}
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Router />
-        <ToastContainer />
-      </BrowserRouter>
-    </AuthProvider>
+    <div>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+      <ToastContainer />
+    </div>
   )
 }
 

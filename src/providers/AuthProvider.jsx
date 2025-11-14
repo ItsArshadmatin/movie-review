@@ -1,22 +1,42 @@
-// import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 
-// // create an empty context
-// const AuthContext = createContext()
+const AuthContext = createContext()
 
-// function AuthProvider({ children }) {
-//   // create state to store logged user information
-//   const [user, setUser] = useState(null)
+function AuthProvider({ children }) {
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-//   return (
-//     <AuthContext.Provider value={{ user, setUser }}>
-//       {children}
-//     </AuthContext.Provider>
-//   )
-// }
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    const userData = localStorage.getItem('user')
+    
+    if (token && userData) {
+      setUser(JSON.parse(userData))
+    }
+    setLoading(false)
+  }, [])
 
-// export default AuthProvider
+  const login = (userData, token) => {
+    localStorage.setItem('token', token)
+    localStorage.setItem('user', JSON.stringify(userData))
+    setUser(userData)
+  }
 
-// // expose the context using custom hook
-// export function useAuth() {
-//   return useContext(AuthContext)
-// }
+  const logout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setUser(null)
+  }
+
+  return (
+    <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export default AuthProvider
+
+export function useAuth() {
+  return useContext(AuthContext)
+}
